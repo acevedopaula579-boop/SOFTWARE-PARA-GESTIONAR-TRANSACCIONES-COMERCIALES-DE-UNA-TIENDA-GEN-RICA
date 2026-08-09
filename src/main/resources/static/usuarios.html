@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Tienda SSPV</title>
+    <link rel="stylesheet" href="css/usuarios.css">
+</head>
+<body>
+    <header class="encabezado">
+        <div class="encabezado-contenido">
+            <div class="encabezado-texto">
+                <span class="marca">Tienda SSPV</span>
+                <h1>Gestión de Usuarios</h1>
+            </div>
+            <a href="login.html" class="enlace-salir">Cerrar sesión</a>
+        </div>
+    </header>
+
+    <main class="contenido">
+        <section class="tarjeta">
+            <h2>Registro de Usuarios</h2>
+            <form id="formulario-usuario" novalidate>
+                <div class="fila-campos">
+                    <div class="campo">
+                        <label for="cedula">Cédula</label>
+                        <input type="text" id="cedula" placeholder="Cédula del usuario">
+                    </div>
+                    <div class="campo">
+                        <label for="nombreCompleto">Nombre Completo</label>
+                        <input type="text" id="nombreCompleto" placeholder="Nombres y apellidos">
+                    </div>
+                    <div class="campo">
+                        <label for="correoElectronico">Correo Electrónico</label>
+                        <input type="text" id="correoElectronico" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="campo">
+                        <label for="usuario">Usuario</label>
+                        <input type="text" id="usuario" placeholder="Nombre de usuario">
+                    </div>
+                    <div class="campo">
+                        <label for="contrasena">Contraseña</label>
+                        <input type="password" id="contrasena" placeholder="Contraseña">
+                    </div>
+                </div>
+                <div id="mensaje-usuario" class="mensaje" hidden></div>
+                <div class="acciones">
+                    <button type="button" id="boton-crear" class="boton boton-crear">Crear</button>
+                    <button type="button" id="boton-consultar" class="boton boton-neutral">Consultar</button>
+                    <button type="button" id="boton-actualizar" class="boton boton-neutral">Actualizar</button>
+                    <button type="button" id="boton-borrar" class="boton boton-borrar">Borrar</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="tarjeta">
+            <div class="encabezado-tabla">
+                <h2>Usuarios Registrados</h2>
+                <button type="button" id="boton-refrescar" class="boton boton-neutral">Refrescar</button>
+            </div>
+            <table id="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo Electrónico</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="js/usuarios.js"></script>
+</body>
+</html>

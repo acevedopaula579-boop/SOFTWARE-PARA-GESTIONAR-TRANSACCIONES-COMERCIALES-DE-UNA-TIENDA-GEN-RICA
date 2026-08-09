@@ -1,0 +1,134 @@
+:root {
+    --fondo: #FAFAF8;
+    --texto-principal: #211A16;
+    --texto-secundario: #6B6259;
+    --blanco: #FFFFFF;
+    --borde-input: #D9D2C7;
+    --acento: #6F4E37;
+    --acento-oscuro: #5C4033;
+    --verde: #2E7D32;
+    --verde-oscuro: #1B5E20;
+    --verde-claro: #E8F5E9;
+    --verde-texto: #1B5E20;
+    --rojo-claro: #FDECEA;
+    --rojo-texto: #922B21;
+    --radio: 8px;
+    --sombra: 0 4px 20px rgba(33, 26, 22, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--fondo);
+    color: var(--texto-principal);
+    min-height: 100vh;
+}
+
+.contenedor-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.tarjeta-login {
+    background-color: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.titulo-tienda {
+    color: var(--acento-oscuro);
+    font-size: 1.75rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+    color: var(--texto-secundario);
+    text-align: center;
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.campo label {
+    font-size: 0.85rem;
+    color: var(--texto-secundario);
+    margin-bottom: 6px;
+}
+
+.campo input {
+    padding: 10px 12px;
+    border: 1px solid var(--borde-input);
+    border-radius: var(--radio);
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--texto-principal);
+    background-color: var(--blanco);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo input::placeholder {
+    color: #B5AB9F;
+}
+
+.campo input:focus {
+    outline: none;
+    border-color: var(--acento);
+    box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.15);
+}
+
+.mensaje {
+    padding: 10px 14px;
+    border-radius: var(--radio);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.mensaje-exito {
+    background-color: var(--verde-claro);
+    color: var(--verde-texto);
+}
+
+.mensaje-error {
+    background-color: var(--rojo-claro);
+    color: var(--rojo-texto);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radio);
+    background-color: var(--verde);
+    color: var(--blanco);
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--verde-oscuro);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

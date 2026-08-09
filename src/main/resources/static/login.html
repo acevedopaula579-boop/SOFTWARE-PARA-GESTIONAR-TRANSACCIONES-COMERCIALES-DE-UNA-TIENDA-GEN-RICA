@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Tienda SSPV</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <main class="contenedor-login">
+        <div class="tarjeta-login">
+            <h1 class="titulo-tienda">Tienda SSPV</h1>
+            <p class="subtitulo">Ingrese sus credenciales para acceder al sistema</p>
+            <form id="formulario-login" novalidate>
+                <div class="campo">
+                    <label for="usuario">Usuario</label>
+                    <input type="text" id="usuario" name="usuario" autocomplete="username" placeholder="Nombre de usuario">
+                </div>
+                <div class="campo">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" autocomplete="current-password" placeholder="Contraseña">
+                </div>
+                <div id="mensaje-login" class="mensaje" hidden></div>
+                <button type="submit" id="boton-ingresar">Ingresar</button>
+            </form>
+        </div>
+    </main>
+    <script src="js/login.js"></script>
+</body>
+</html>

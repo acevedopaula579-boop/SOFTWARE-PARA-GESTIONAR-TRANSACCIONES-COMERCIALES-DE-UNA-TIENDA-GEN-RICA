@@ -1,3 +1,4 @@
+
 # Tienda Genérica - Sprint 1 (Login y Gestión de Usuarios)
 
 Proyecto Spring Boot para gestionar las transacciones comerciales de una tienda genérica.
@@ -124,3 +125,5 @@ src/main/resources
     ├── js/login.js
     └── js/usuarios.js
 ```
+=======
+

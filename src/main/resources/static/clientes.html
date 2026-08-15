@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tienda SSPV - Gestión de Clientes</title>
+
+<style>
+
+:root {
+    --cafe-oscuro: #3d2a1f;
+    --cafe: #6b4423;
+    --cafe-claro: #e8ddd0;
+    --verde: #2f6a3f;
+    --verde-hover: #24512f;
+    --rojo: #b0392b;
+    --rojo-hover: #922e23;
+    --gris-fondo: #f3f1ee;
+    --gris-borde: #d9d3ca;
+    --texto: #2b2118;
+    --exito-fondo: #e3f1e6;
+    --exito-texto: #276b3b;
+    --error-fondo: #f9e4e1;
+    --error-texto: #a4342a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--gris-fondo);
+    color: var(--texto);
+}
+
+header {
+    background: var(--cafe-oscuro);
+    color: #fff;
+    padding: 18px 32px;
+}
+
+header .marca {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    opacity: 0.75;
+    text-transform: uppercase;
+}
+
+header h1 {
+    margin: 2px 0 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    color: var(--cafe-oscuro);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.grid .full {
+    grid-column: 1 / -1;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    color: #6b5f52;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--cafe);
+}
+
+.mensaje {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: none;
+}
+
+.mensaje.exito {
+    display: block;
+    background: var(--exito-fondo);
+    color: var(--exito-texto);
+}
+
+.mensaje.error {
+    display: block;
+    background: var(--error-fondo);
+    color: var(--error-texto);
+}
+
+.botones {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+button.accion {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-crear {
+    background: var(--verde);
+}
+
+.btn-crear:hover {
+    background: var(--verde-hover);
+}
+
+.btn-consultar,
+.btn-actualizar {
+    background: var(--cafe);
+}
+
+.btn-consultar:hover,
+.btn-actualizar:hover {
+    background: var(--cafe-oscuro);
+}
+
+.btn-borrar {
+    background: var(--rojo);
+}
+
+.btn-borrar:hover {
+    background: var(--rojo-hover);
+}
+
+.tabla-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.tabla-header h2 {
+    margin: 0;
+}
+
+.btn-refrescar {
+    background: var(--cafe);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-refrescar:hover {
+    background: var(--cafe-oscuro);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid var(--gris-borde);
+}
+
+th {
+    background: var(--cafe-claro);
+    color: var(--cafe-oscuro);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+tr:hover td {
+    background: #faf8f5;
+}
+
+.vacio {
+    padding: 20px;
+    text-align: center;
+    color: #9a8d7d;
+    font-size: 13px;
+}
+
+@media (max-width: 650px) {
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grid .full {
+        grid-column: auto;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="marca">Tienda SSPV</div>
+    <h1>Gestión de Clientes</h1>
+</header>
+
+<main>
+
+    <!-- REGISTRO DE CLIENTE -->
+
+    <div class="card">
+
+        <h2>Registro de Clientes</h2>
+
+        <div class="grid">
+
+            <div>
+                <label>Cédula</label>
+                <input
+                    type="number"
+                    id="c-cedula"
+                    placeholder="Cédula del cliente">
+            </div>
+
+            <div>
+                <label>Nombre Completo</label>
+                <input
+                    type="text"
+                    id="c-nombre"
+                    placeholder="Nombres y apellidos">
+            </div>
+
+            <div>
+                <label>Correo Electrónico</label>
+                <input
+                    type="email"
+                    id="c-correo"
+                    placeholder="correo@ejemplo.com">
+            </div>
+
+            <div>
+                <label>Teléfono</label>
+                <input
+                    type="text"
+                    id="c-telefono"
+                    placeholder="Número de contacto">
+            </div>
+
+            <div class="full">
+                <label>Dirección</label>
+                <input
+                    type="text"
+                    id="c-direccion"
+                    placeholder="Dirección (opcional)">
+            </div>
+
+        </div>
+
+        <div class="botones">
+
+            <button
+                class="accion btn-crear"
+                onclick="crearCliente()">
+                Crear
+            </button>
+
+            <button
+                class="accion btn-consultar"
+                onclick="consultarCliente()">
+                Consultar
+            </button>
+
+            <button
+                class="accion btn-actualizar"
+                onclick="actualizarCliente()">
+                Actualizar
+            </button>
+
+            <button
+                class="accion btn-borrar"
+                onclick="borrarCliente()">
+                Borrar
+            </button>
+
+        </div>
+
+        <div id="c-mensaje" class="mensaje"></div>
+
+    </div>
+
+
+    <!-- TABLA DE CLIENTES -->
+
+    <div class="card">
+
+        <div class="tabla-header">
+
+            <h2>Clientes Registrados</h2>
+
+            <button
+                class="btn-refrescar"
+                onclick="listarClientes()">
+                Refrescar
+            </button>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="c-tabla"></tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+
+<script>
+
+const BASE_URL = "/api";
+
+
+function mostrarMensaje(idDiv, texto, esExito) {
+
+    const div = document.getElementById(idDiv);
+
+    div.textContent = texto;
+
+    div.className =
+        "mensaje " + (esExito ? "exito" : "error");
+}
+
+
+async function llamar(url, metodo, cuerpo) {
+
+    try {
+
+        const opciones = {
+            method: metodo,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+
+        if (cuerpo) {
+            opciones.body = JSON.stringify(cuerpo);
+        }
+
+        const respuesta = await fetch(url, opciones);
+
+        const datos =
+            await respuesta.json().catch(() => ({}));
+
+        return {
+            ok: respuesta.ok,
+            datos: datos
+        };
+
+    } catch (error) {
+
+        return {
+            ok: false,
+            datos: {
+                mensaje: "No se pudo conectar con el servidor"
+            }
+        };
+    }
+}
+
+
+/* =========================
+   CREAR CLIENTE
+   ========================= */
+
+async function crearCliente() {
+
+    const cuerpo = {
+
+        cedula:
+            Number(document.getElementById("c-cedula").value),
+
+        nombreCompleto:
+            document.getElementById("c-nombre").value,
+
+        correoElectronico:
+            document.getElementById("c-correo").value,
+
+        telefono:
+            document.getElementById("c-telefono").value,
+
+        direccion:
+            document.getElementById("c-direccion").value
+    };
+
+
+    const { ok, datos } =
+        await llamar(
+            `${BASE_URL}/clientes`,
+            "POST",
+            cuerpo
+        );
+
+
+    mostrarMensaje(
+        "c-mensaje",
+        datos.mensaje ||
+        (ok ? "Cliente Creado" : "Error"),
+        ok
+    );
+
+
+    if (ok) {
+
+        limpiarFormularioCliente();
+
+        listarClientes();
+    }
+}
+
+
+/* =========================
+   CONSULTAR CLIENTE
+   ========================= */
+
+async function consultarCliente() {
+
+    const cedula =
+        document.getElementById("c-cedula").value;
+
+
+    if (!cedula) {
+
+        mostrarMensaje(
+            "c-mensaje",
+            "Ingrese la cédula del cliente",
+            false
+        );
+
+        return;
+    }
+
+
+    const { ok, datos } =
+        await llamar(
+            `${BASE_URL}/clientes/${cedula}`,
+            "GET"
+        );
+
+
+    mostrarMensaje(
+        "c-mensaje",
+        datos.mensaje ||
+        (ok
+            ? "Datos del cliente"
+            : "Cliente Inexistente"),
+        ok
+    );
+
+
+    if (ok && datos.datos) {
+
+        document.getElementById("c-nombre").value =
+            datos.datos.nombreCompleto || "";
+
+        document.getElementById("c-correo").value =
+            datos.datos.correoElectronico || "";
+
+        document.getElementById("c-telefono").value =
+            datos.datos.telefono || "";
+
+        document.getElementById("c-direccion").value =
+            datos.datos.direccion || "";
+    }
+}
+
+
+/* =========================
+   ACTUALIZAR CLIENTE
+   ========================= */
+
+async function actualizarCliente() {
+
+    const cedula =
+        document.getElementById("c-cedula").value;
+
+
+    const cuerpo = {
+
+        nombreCompleto:
+            document.getElementById("c-nombre").value,
+
+        correoElectronico:
+            document.getElementById("c-correo").value,
+
+        telefono:
+            document.getElementById("c-telefono").value,
+
+        direccion:
+            document.getElementById("c-direccion").value
+    };
+
+
+    const { ok, datos } =
+        await llamar(
+            `${BASE_URL}/clientes/${cedula}`,
+            "PUT",
+            cuerpo
+        );
+
+
+    mostrarMensaje(
+        "c-mensaje",
+        datos.mensaje ||
+        (ok
+            ? "Datos del Cliente Actualizados"
+            : "Error"),
+        ok
+    );
+
+
+    if (ok) {
+
+        listarClientes();
+    }
+}
+
+
+/* =========================
+   BORRAR CLIENTE
+   ========================= */
+
+async function borrarCliente() {
+
+    const cedula =
+        document.getElementById("c-cedula").value;
+
+
+    if (!cedula) {
+
+        mostrarMensaje(
+            "c-mensaje",
+            "Ingrese la cédula del cliente",
+            false
+        );
+
+        return;
+    }
+
+
+    const confirmar =
+        confirm(
+            "¿Está seguro de borrar este cliente?"
+        );
+
+
+    if (!confirmar) {
+        return;
+    }
+
+
+    const { ok, datos } =
+        await llamar(
+            `${BASE_URL}/clientes/${cedula}`,
+            "DELETE"
+        );
+
+
+    mostrarMensaje(
+        "c-mensaje",
+        datos.mensaje ||
+        (ok
+            ? "Datos del Cliente Borrados"
+            : "Error"),
+        ok
+    );
+
+
+    if (ok) {
+
+        limpiarFormularioCliente();
+
+        listarClientes();
+    }
+}
+
+
+/* =========================
+   LISTAR CLIENTES
+   ========================= */
+
+async function listarClientes() {
+
+    const { ok, datos } =
+        await llamar(
+            `${BASE_URL}/clientes`,
+            "GET"
+        );
+
+
+    const tbody =
+        document.getElementById("c-tabla");
+
+
+    tbody.innerHTML = "";
+
+
+    const lista =
+        (ok && datos.datos)
+            ? datos.datos
+            : [];
+
+
+    if (lista.length === 0) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="5" class="vacio">
+                    No hay clientes registrados
+                </td>
+            </tr>`;
+
+        return;
+    }
+
+
+    lista.forEach(c => {
+
+        tbody.innerHTML +=
+            `<tr>
+
+                <td>${c.cedula}</td>
+
+                <td>${c.nombreCompleto ?? ""}</td>
+
+                <td>${c.correoElectronico ?? ""}</td>
+
+                <td>${c.telefono ?? ""}</td>
+
+                <td>${c.direccion ?? ""}</td>
+
+            </tr>`;
+    });
+}
+
+
+/* =========================
+   LIMPIAR FORMULARIO
+   ========================= */
+
+function limpiarFormularioCliente() {
+
+    document.getElementById("c-cedula").value = "";
+    document.getElementById("c-nombre").value = "";
+    document.getElementById("c-correo").value = "";
+    document.getElementById("c-telefono").value = "";
+    document.getElementById("c-direccion").value = "";
+}
+
+
+/* Cargar clientes al abrir */
+
+listarClientes();
+
+</script>
+
+</body>
+</html>

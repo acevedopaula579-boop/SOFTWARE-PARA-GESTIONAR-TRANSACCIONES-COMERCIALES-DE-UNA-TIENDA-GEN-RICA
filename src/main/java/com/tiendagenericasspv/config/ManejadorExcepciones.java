@@ -2,6 +2,8 @@ package com.tiendagenericasspv.config;
 
 import com.tiendagenericasspv.dto.RespuestaMensaje;
 import com.tiendagenericasspv.servicio.CedulaErradaException;
+import com.tiendagenericasspv.servicio.ClienteInexistenteException;
+import com.tiendagenericasspv.servicio.ProveedorInexistenteException;
 import com.tiendagenericasspv.servicio.DatosFaltantesException;
 import com.tiendagenericasspv.servicio.UsuarioInexistenteException;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,18 @@ public class ManejadorExcepciones {
     @ExceptionHandler(UsuarioInexistenteException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public RespuestaMensaje usuarioInexistente(UsuarioInexistenteException excepcion) {
+        return new RespuestaMensaje(false, excepcion.getMessage());
+    }
+
+    @ExceptionHandler(ClienteInexistenteException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public RespuestaMensaje clienteInexistente(ClienteInexistenteException excepcion) {
+        return new RespuestaMensaje(false, excepcion.getMessage());
+    }
+
+    @ExceptionHandler(ProveedorInexistenteException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public RespuestaMensaje proveedorInexistente(ProveedorInexistenteException excepcion) {
         return new RespuestaMensaje(false, excepcion.getMessage());
     }
 

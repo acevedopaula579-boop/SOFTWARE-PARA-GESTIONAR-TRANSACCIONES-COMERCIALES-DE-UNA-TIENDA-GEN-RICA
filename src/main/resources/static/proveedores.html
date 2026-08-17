@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda SSPV - Gestión de Proveedores</title>
+    <link rel="stylesheet" href="css/gestion.css">
+</head>
+<body>
+    <header>
+        <div class="marca">Tienda SSPV</div>
+        <h1>Gestión de Proveedores</h1>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Registro de Proveedores</h2>
+            <div class="grid">
+                <div>
+                    <label for="p-nit">NIT</label>
+                    <input type="number" id="p-nit" placeholder="NIT del proveedor">
+                </div>
+                <div>
+                    <label for="p-nombre">Nombre de la Empresa</label>
+                    <input type="text" id="p-nombre" placeholder="Razón social">
+                </div>
+                <div>
+                    <label for="p-correo">Correo Electrónico</label>
+                    <input type="email" id="p-correo" placeholder="correo@ejemplo.com">
+                </div>
+                <div>
+                    <label for="p-telefono">Teléfono</label>
+                    <input type="text" id="p-telefono" placeholder="Número de contacto">
+                </div>
+                <div class="full">
+                    <label for="p-direccion">Dirección</label>
+                    <input type="text" id="p-direccion" placeholder="Dirección (opcional)">
+                </div>
+            </div>
+
+            <div class="botones">
+                <button type="button" id="boton-crear" class="accion btn-crear">Crear</button>
+                <button type="button" id="boton-consultar" class="accion btn-consultar">Consultar</button>
+                <button type="button" id="boton-actualizar" class="accion btn-actualizar">Actualizar</button>
+                <button type="button" id="boton-borrar" class="accion btn-borrar">Borrar</button>
+            </div>
+
+            <div id="p-mensaje" class="mensaje" hidden></div>
+        </div>
+
+        <div class="card">
+            <div class="tabla-header">
+                <h2>Proveedores Registrados</h2>
+                <button type="button" id="boton-refrescar" class="btn-refrescar">Refrescar</button>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>NIT</th><th>Nombre Empresa</th><th>Correo</th><th>Teléfono</th><th>Dirección</th></tr>
+                </thead>
+                <tbody id="p-tabla"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/proveedores.js"></script>
+</body>
+</html>

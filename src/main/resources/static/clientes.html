@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda SSPV - Gestión de Clientes</title>
+    <link rel="stylesheet" href="css/gestion.css">
+</head>
+<body>
+    <header>
+        <div class="marca">Tienda SSPV</div>
+        <h1>Gestión de Clientes</h1>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Registro de Clientes</h2>
+            <div class="grid">
+                <div>
+                    <label for="c-cedula">Cédula</label>
+                    <input type="number" id="c-cedula" placeholder="Cédula del cliente">
+                </div>
+                <div>
+                    <label for="c-nombre">Nombre Completo</label>
+                    <input type="text" id="c-nombre" placeholder="Nombres y apellidos">
+                </div>
+                <div>
+                    <label for="c-correo">Correo Electrónico</label>
+                    <input type="email" id="c-correo" placeholder="correo@ejemplo.com">
+                </div>
+                <div>
+                    <label for="c-telefono">Teléfono</label>
+                    <input type="text" id="c-telefono" placeholder="Número de contacto">
+                </div>
+                <div class="full">
+                    <label for="c-direccion">Dirección</label>
+                    <input type="text" id="c-direccion" placeholder="Dirección (opcional)">
+                </div>
+            </div>
+
+            <div class="botones">
+                <button type="button" id="boton-crear" class="accion btn-crear">Crear</button>
+                <button type="button" id="boton-consultar" class="accion btn-consultar">Consultar</button>
+                <button type="button" id="boton-actualizar" class="accion btn-actualizar">Actualizar</button>
+                <button type="button" id="boton-borrar" class="accion btn-borrar">Borrar</button>
+            </div>
+
+            <div id="c-mensaje" class="mensaje" hidden></div>
+        </div>
+
+        <div class="card">
+            <div class="tabla-header">
+                <h2>Clientes Registrados</h2>
+                <button type="button" id="boton-refrescar" class="btn-refrescar">Refrescar</button>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Cédula</th><th>Nombre Completo</th><th>Correo</th><th>Teléfono</th><th>Dirección</th></tr>
+                </thead>
+                <tbody id="c-tabla"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/clientes.js"></script>
+</body>
+</html>

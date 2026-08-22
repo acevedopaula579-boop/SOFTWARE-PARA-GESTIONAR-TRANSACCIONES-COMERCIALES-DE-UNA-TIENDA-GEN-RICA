@@ -1,8 +1,6 @@
+# Tienda Genérica - Sistema de Gestión Comercial
 
-# Tienda Genérica - Sprint 1 (Login y Gestión de Usuarios)
-
-Proyecto Spring Boot para gestionar las transacciones comerciales de una tienda genérica.
-Este sprint implementa únicamente el **módulo de login** y el **módulo de gestión de usuarios (CRUD)**.
+Proyecto Spring Boot para gestionar las transacciones comerciales de una tienda genérica (Arquitectura de Sistemas II).
 
 ## Requisitos previos
 
@@ -10,23 +8,23 @@ Este sprint implementa únicamente el **módulo de login** y el **módulo de ges
 - **Maven 3.6+**
 - **MySQL 8.0** (ejecutándose en `localhost:3306`)
 
-## 1. Configuración de la base de datos
+---
+
+## 1. Configuración de la Base de Datos
 
 1. Inicie el servicio de MySQL 8.0.
-2. La base de datos `tienda_generica` se crea automáticamente al arrancar la aplicación
-   (`createDatabaseIfNotExist=true`).
-
-3. Ajuste las credenciales de conexión en `src/main/resources/application.properties` si su
-   usuario o contraseña de MySQL no son `root` / `root`:
+2. La base de datos `tienda_generica` se crea automáticamente al arrancar la aplicación (`createDatabaseIfNotExist=true`).
+3. Ajuste las credenciales de conexión en `src/main/resources/application.properties` si su usuario o contraseña de MySQL son diferentes de `root` / `root`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/tienda_generica?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+spring.datasource.url=jdbc:mysql://localhost:3306/tienda_generica?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=root
 ```
 
-La tabla `usuarios` y el usuario administrador inicial se crean automáticamente al arrancar
-la aplicación (Hibernate `ddl-auto=update`).
+Las tablas (`usuarios`, `clientes`, `proveedores`, `productos`) y el usuario administrador inicial se crean y actualizan automáticamente al arrancar la aplicación (Hibernate `ddl-auto=update`).
+
+---
 
 ## 2. Ejecución
 
@@ -36,94 +34,99 @@ mvn spring-boot:run
 
 La aplicación quedará disponible en `http://localhost:8080`.
 
-- Página de login: `http://localhost:8080/login.html`
-- Página de gestión de usuarios: `http://localhost:8080/usuarios.html`
+- **Login**: `http://localhost:8080/login.html`
+- **Gestión de Usuarios**: `http://localhost:8080/usuarios.html`
+- **Gestión de Clientes**: `http://localhost:8080/clientes.html`
+- **Gestión de Proveedores**: `http://localhost:8080/proveedores.html`
+- **Gestión de Productos**: `http://localhost:8080/productos.html`
 
-### Usuario inicial
+### Usuario inicial por defecto
 
-| Usuario      | Contraseña   |
-|--------------|--------------|
+| Usuario | Contraseña |
+|---|---|
 | `admininicial` | `admin123456` |
 
-> **Regla de negocio:** al crear el primer usuario real (distinto de `admininicial`) mediante
-> el CRUD, el usuario `admininicial` se desactiva automáticamente (`activo = false`) sin borrarse.
-> Un usuario inactivo no puede iniciar sesión.
+---
 
-## 3. API REST
+## 3. Módulos Implementados
 
-Todas las respuestas usan el formato `{ "exito": true/false, "mensaje": "texto", "datos": {} }`.
+### Sprint 1: Login y Usuarios
+- Inicio de sesión por usuario y contraseña.
+- CRUD completo de usuarios con desactivación de `admininicial`.
 
-| Acción            | Método | Endpoint              | HTTP éxito | Mensaje éxito                    | HTTP error | Mensaje error                                   |
-|-------------------|--------|-----------------------|------------|----------------------------------|------------|--------------------------------------------------|
-| Login             | POST   | `/api/login`          | 200        | Ingreso exitoso al sistema       | 404        | usuario o contraseña errados, intente de nuevo   |
-| Crear usuario     | POST   | `/api/usuarios`       | 201        | Usuario Creado                   | 400        | Faltan datos del usuario                         |
-| Consultar usuario | GET    | `/api/usuarios/{cedula}` | 200      | datos del usuario                | 404        | Usuario Inexistente                              |
-| Listar usuarios   | GET    | `/api/usuarios`       | 200        | lista de usuarios                | —          | —                                                |
-| Actualizar usuario| PUT    | `/api/usuarios/{cedula}` | 200      | Datos del Usuario Actualizados   | 400        | Datos faltantes                                  |
-| Borrar usuario    | DELETE | `/api/usuarios/{cedula}` | 200      | Datos del Usuario Borrados       | 400        | Cédula Errada                                    |
+### Sprint 2: Clientes y Proveedores
+- CRUD de Clientes (`/api/clientes`).
+- CRUD de Proveedores (`/api/proveedores`).
 
-La contraseña **nunca** se devuelve en las respuestas de consultar/crear/actualizar/listar.
+### Sprint 3: Gestión de Productos (HU-014)
+- Carga masiva de productos desde archivo CSV (`/api/productos/cargar`).
+- Validación transaccional y atómica:
+  1. Validación de extensión y formato CSV.
+  2. Validación de cantidad de columnas (6 columnas requeridas).
+  3. Validación de tipos numéricos y longitud de campos.
+  4. Validación obligatoria de existencia del proveedor en base de datos (`nitproveedor`).
+  5. Reemplazo atómico: Si el archivo es válido, elimina los productos previos e inserta los nuevos. Si ocurre algún error, se realiza rollback automático preservando los productos anteriores.
+- Endpoints REST para consulta individual por código (`/api/productos/{codigo}`) y listado de productos (`/api/productos`).
+- Interfaz web gráfica en `productos.html` con botones `Examinar`, `Cargar`, mensajes de estado y tabla de productos.
 
-### Ejemplos
+---
 
-Login:
+## 4. API REST
+
+Todas las respuestas manejan el formato unificado:
+```json
+{
+  "exito": true,
+  "mensaje": "Descripción del resultado",
+  "datos": {}
+}
+```
+
+### Endpoints del Módulo de Productos
+
+| Acción | Método | Endpoint | HTTP Éxito | Mensaje Éxito | HTTP Error | Mensaje Error |
+|---|---|---|---|---|---|---|
+| Cargar productos CSV | POST | `/api/productos/cargar` | 200 | `Archivo Cargado Exitosamente` | 400 | `Error: no se seleccionó archivo para cargar` / `Error: formato de archivo inválido` / `Error: datos leídos inválidos` |
+| Consultar producto | GET | `/api/productos/{codigo}` | 200 | `datos del producto` | 404 | `Producto Inexistente` |
+| Listar productos | GET | `/api/productos` | 200 | `lista de productos` | — | — |
+| Crear producto | POST | `/api/productos` | 201 | `Producto Creado` | 400 | `Datos faltantes` / `Error: datos leídos inválidos` |
+| Actualizar producto | PUT | `/api/productos/{codigo}` | 200 | `Datos del Producto Actualizados` | 400 / 404 | `Datos faltantes` / `Producto Inexistente` |
+| Borrar producto | DELETE | `/api/productos/{codigo}` | 200 | `Datos del Producto Borrados` | 404 | `Producto Inexistente` |
+
+---
+
+## 5. Instrucciones de Integración para el Desarrollador del Sprint 4 (Ventas)
+
+El módulo de Ventas (Sprint 4) requiere consumir información de los productos cargados en el Sprint 3:
+
+1. **Consulta de producto por código**:
+   - Endpoint: `GET /api/productos/{codigo}`
+   - Ejemplo de consumo desde JavaScript:
+     ```javascript
+     const respuesta = await fetch(`/api/productos/${codigo}`);
+     const res = await respuesta.json();
+     if (res.exito) {
+         const producto = res.datos;
+         const nombre = producto.nombreProducto;
+         const precioVenta = producto.precioVenta;
+         const iva = producto.ivacompra; // Porcentaje de IVA definido
+         // Realizar cálculo de la venta...
+     }
+     ```
+2. **Campos disponibles en la entidad `Producto`**:
+   - `codigoProducto` (Long): Identificador único del producto.
+   - `nombreProducto` (String): Nombre o descripción comercial.
+   - `nitproveedor` (Long): NIT del proveedor asociado.
+   - `precioCompra` (Double): Precio de compra.
+   - `ivacompra` (Double): Porcentaje de IVA para el producto.
+   - `precioVenta` (Double): Precio de venta al público para calcular totales.
+
+---
+
+## 6. Pruebas Automatizadas
+
+Para ejecutar la suite de pruebas unitarias y de integración:
 
 ```bash
-curl -X POST http://localhost:8080/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"usuario":"admininicial","contrasena":"admin123456"}'
+mvn test
 ```
-
-Crear usuario:
-
-```bash
-curl -X POST http://localhost:8080/api/usuarios \
-  -H "Content-Type: application/json" \
-  -d '{"cedula":1234567890,"nombreCompleto":"Ana López","correoElectronico":"ana@correo.com","usuario":"analopez","contrasena":"mipassword"}'
-```
-
-## 4. Casos de prueba (SP1-QA-1 a SP1-QA-10)
-
-| ID         | Descripción                                        | Resultado esperado                                                     |
-|------------|----------------------------------------------------|------------------------------------------------------------------------|
-| SP1-QA-1   | Login correcto `admininicial` / `admin123456`       | HTTP 200, "Ingreso exitoso al sistema"                                 |
-| SP1-QA-2   | Login con credenciales incorrectas                 | HTTP 404, "usuario o contraseña errados, intente de nuevo"             |
-| SP1-QA-3   | Crear usuario con todos los datos                  | HTTP 201, "Usuario Creado"                                             |
-| SP1-QA-4   | Crear usuario con algún dato faltante              | HTTP 400, "Faltan datos del usuario"                                   |
-| SP1-QA-5   | Consultar cédula existente                         | HTTP 200, retorna datos sin contraseña                                 |
-| SP1-QA-6   | Consultar cédula inexistente                       | HTTP 404, "Usuario Inexistente"                                        |
-| SP1-QA-7   | Actualizar con datos completos                     | HTTP 200, "Datos del Usuario Actualizados"                             |
-| SP1-QA-8   | Actualizar con algún dato en blanco                | HTTP 400, "Datos faltantes"                                            |
-| SP1-QA-9   | Borrar usuario existente                           | HTTP 200, "Datos del Usuario Borrados"                                 |
-| SP1-QA-10  | Borrar con cédula en blanco/inexistente/alterada   | HTTP 400, "Cédula Errada"                                              |
-
-## 5. Estructura del proyecto
-
-```
-src/main/java/com/tiendagenericasspv
-├── TiendaGenericaSspvApplication.java
-├── modelo/Usuario.java
-├── repositorio/UsuarioRepositorio.java
-├── servicio/UsuarioServicio.java
-├── servicio/DatosFaltantesException.java
-├── servicio/UsuarioInexistenteException.java
-├── servicio/CedulaErradaException.java
-├── controlador/LoginControlador.java
-├── controlador/UsuarioControlador.java
-├── config/CargadorDatosIniciales.java
-├── config/ManejadorExcepciones.java
-└── dto/PeticionLogin.java
-└── dto/RespuestaMensaje.java
-
-src/main/resources
-├── application.properties
-└── static
-    ├── login.html
-    ├── usuarios.html
-    ├── css/login.css
-    ├── css/usuarios.css
-    ├── js/login.js
-    └── js/usuarios.js
-```
-=======
-

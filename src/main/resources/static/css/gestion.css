@@ -111,3 +111,57 @@ th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--gris-bo
 th { background: var(--cafe-claro); color: var(--cafe-oscuro); font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
 tr:hover td { background: #faf8f5; }
 .vacio { padding: 20px; text-align: center; color: #9a8d7d; font-size: 13px; }
+
+.nav-menu {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding-top: 10px;
+  flex-wrap: wrap;
+}
+.nav-menu a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  opacity: 0.85;
+  padding: 5px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.nav-menu a:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.12);
+}
+.nav-menu a.activo {
+  opacity: 1;
+  font-weight: 600;
+  background: rgba(255,255,255,0.22);
+}
+
+.upload-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+.upload-box input[type="text"] {
+  flex: 1;
+  background-color: #fafafa;
+}
+.btn-examinar {
+  background: var(--cafe);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-examinar:hover {
+  background: var(--cafe-oscuro);
+}
+

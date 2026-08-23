@@ -1,5 +1,5 @@
 /* =========================================================
-   ESTILOS EXCLUSIVOS MÓDULO DE REPORTES
+   ESTILOS EXCLUSIVOS MÓDULO DE REPORTES Y NOTIFICACIONES
    ========================================================= */
 
 .btn-reporte {
@@ -34,4 +34,14 @@
   border-top: 2px solid var(--cafe-oscuro);
   color: var(--cafe-oscuro);
   font-size: 14px;
+}
+
+/* Soporte para alertas inline usando las clases de gestion.css */
+.mensaje[hidden] {
+  display: none !important;
+}
+
+.mensaje {
+  margin-top: 0;
+  margin-bottom: 15px;
 }

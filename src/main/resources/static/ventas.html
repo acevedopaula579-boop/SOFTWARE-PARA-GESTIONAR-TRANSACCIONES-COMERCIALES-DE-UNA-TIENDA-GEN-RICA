@@ -28,7 +28,7 @@
         <div class="card">
             <h2>Datos del Cliente</h2>
             <form id="form-cliente" onsubmit="event.preventDefault();">
-                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px;">
                     <div style="flex: 1; min-width: 200px;">
                         <label for="cedulaCliente">Cédula Cliente</label>
                         <input type="number" id="cedulaCliente" placeholder="Ingrese cédula">
@@ -48,6 +48,9 @@
                         <input type="text" id="codigoVenta" readonly placeholder="--" style="font-weight: bold; text-align: center;">
                     </div>
                 </div>
+
+                <!-- ALERTA ESTILO COMPAÑERA -->
+                <div id="mensaje-cliente" class="mensaje" hidden></div>
             </form>
         </div>
 
@@ -102,6 +105,9 @@
                 </tbody>
             </table>
 
+            <!-- ALERTA ESTILO COMPAÑERA -->
+            <div id="mensaje-venta" class="mensaje" hidden style="margin-top: 15px;"></div>
+
             <!-- Resumen de Totales Horizontal -->
             <div style="display: flex; gap: 15px; justify-content: flex-end; align-items: flex-end; margin-top: 20px; flex-wrap: wrap;">
                 <div>
@@ -123,7 +129,8 @@
         </div>
     </main>
 
-    <script src="js/ventas.js"></script>
+    <!-- Forzamos la actualización del script con ?v=2 -->
+    <script src="js/ventas.js?v=2"></script>
 </body>
 
 </html>

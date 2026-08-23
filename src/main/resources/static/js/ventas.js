@@ -1,6 +1,35 @@
 const BASE_URL = "http://localhost:8080/api";
 
-// Función centralizada para peticiones
+// ==========================================
+// FUNCIONES DE CONTROL DE ALERTAS
+// ==========================================
+
+function mostrarMensaje(idContenedor, texto, tipo = "error") {
+  const elem = document.getElementById(idContenedor);
+  if (!elem) return;
+
+  elem.textContent = texto;
+  elem.className = `mensaje ${tipo}`;
+  elem.removeAttribute("hidden");
+}
+
+function ocultarMensaje(idContenedor) {
+  const elem = document.getElementById(idContenedor);
+  if (elem) {
+    elem.setAttribute("hidden", "true");
+    elem.textContent = "";
+  }
+}
+
+function limpiarTodasLasAlertas() {
+  ocultarMensaje("mensaje-cliente");
+  ocultarMensaje("mensaje-venta");
+}
+
+// ==========================================
+// CONSULTAS API Y CÁLCULOS
+// ==========================================
+
 async function llamar(url, metodo, cuerpo) {
   const opciones = { method: metodo, headers: { "Content-Type": "application/json" } };
   if (cuerpo) opciones.body = JSON.stringify(cuerpo);
@@ -11,7 +40,6 @@ async function llamar(url, metodo, cuerpo) {
   return { ok: respuesta.ok, status: respuesta.status, datos };
 }
 
-// Blanquear todos los campos del formulario (incluyendo el consecutivo)
 function limpiarFormulario() {
   document.getElementById("cedulaCliente").value = "";
   document.getElementById("nombreCliente").value = "";
@@ -30,16 +58,20 @@ function limpiarFormulario() {
   document.getElementById("totalConIva").value = "$ 0";
 }
 
-// Obtener la cédula del usuario en sesión
 function obtenerCedulaUsuario() {
   const usuarioSesion = JSON.parse(sessionStorage.getItem("usuario") || localStorage.getItem("usuario") || "{}");
   return usuarioSesion.cedula || usuarioSesion.cedulaUsuario || 123456;
 }
 
-// 1. Buscar Cliente por Cédula
+// 1. Buscar Cliente
 async function buscarCliente() {
+  ocultarMensaje("mensaje-cliente");
+
   const cedula = document.getElementById("cedulaCliente").value;
-  if (!cedula) return alert("Ingrese la cédula del cliente");
+  if (!cedula) {
+    mostrarMensaje("mensaje-cliente", "Ingrese la cédula del cliente.", "error");
+    return;
+  }
 
   let res = await llamar(`${BASE_URL}/clientes/${cedula}`, "GET");
 
@@ -52,17 +84,24 @@ async function buscarCliente() {
 
   if (res.ok && nombre) {
     document.getElementById("nombreCliente").value = nombre;
+    ocultarMensaje("mensaje-cliente");
   } else {
-    alert(res.datos.mensaje || "Cliente no encontrado");
+    mostrarMensaje("mensaje-cliente", res.datos.mensaje || "Cliente no encontrado.", "error");
     document.getElementById("nombreCliente").value = "";
   }
 }
 
-// 2. Buscar Producto por Código
+// 2. Buscar Producto
 async function buscarProducto(num) {
+  ocultarMensaje("mensaje-venta");
+
   const inputCodigo = document.getElementById(`codigoProducto${num}`);
-  const codigo = inputCodigo.value;
-  if (!codigo) return alert("Ingrese el código del producto");
+  const codigo = inputCodigo ? inputCodigo.value : "";
+
+  if (!codigo) {
+    mostrarMensaje("mensaje-venta", `Ingrese el código del producto en la fila ${num}.`, "error");
+    return;
+  }
 
   let res = await llamar(`${BASE_URL}/productos/${codigo}`, "GET");
 
@@ -80,13 +119,14 @@ async function buscarProducto(num) {
     document.getElementById(`precioProducto${num}`).value = prod.precioVenta || prod.precio_venta || 0;
     document.getElementById(`ivaProducto${num}`).value = prod.ivaCompra || prod.ivacompra || 19;
     calcularFila(num);
+    ocultarMensaje("mensaje-venta");
   } else {
-    alert(res.datos.mensaje || "Producto no encontrado");
+    mostrarMensaje("mensaje-venta", res.datos.mensaje || "Producto no encontrado.", "error");
     limpiarFila(num);
   }
 }
 
-// 3. Cálculos de Totales
+// 3. Totales
 function calcularFila(num) {
   const cantidad = parseFloat(document.getElementById(`cantidadProducto${num}`).value) || 0;
   const precio = parseFloat(document.getElementById(`precioProducto${num}`).value) || 0;
@@ -124,8 +164,13 @@ function limpiarFila(num) {
 
 // 4. Confirmar Venta
 async function confirmarVenta() {
+  limpiarTodasLasAlertas();
+
   const cedulaCliente = document.getElementById("cedulaCliente").value;
-  if (!cedulaCliente) return alert("Debe ingresar la cédula del cliente");
+  if (!cedulaCliente) {
+    mostrarMensaje("mensaje-cliente", "Debe ingresar la cédula del cliente.", "error");
+    return;
+  }
 
   const detalles = [];
   let valorVenta = 0;
@@ -153,7 +198,10 @@ async function confirmarVenta() {
     }
   }
 
-  if (detalles.length === 0) return alert("Debe ingresar al menos un producto con cantidad mayor a cero");
+  if (detalles.length === 0) {
+    mostrarMensaje("mensaje-venta", "Debe ingresar al menos un producto con cantidad mayor a cero.", "error");
+    return;
+  }
 
   const cedulaUsuarioActivo = obtenerCedulaUsuario();
 
@@ -179,18 +227,15 @@ async function confirmarVenta() {
   if (res.ok) {
     const consecutivoGuardado = res.datos.codigoVenta || res.datos.codigo_venta || (res.datos.datos ? res.datos.datos.codigoVenta : res.datos);
 
-    // 1. Mostrar de inmediato el consecutivo en la pantalla
     document.getElementById("codigoVenta").value = consecutivoGuardado;
+    mostrarMensaje("mensaje-venta", `Venta #${consecutivoGuardado} registrada exitosamente.`, "exito");
 
-    // 2. Dar tiempo al navegador para pintar el número en pantalla antes de lanzar el alert
     setTimeout(() => {
-      alert(`Venta #${consecutivoGuardado} registrada exitosamente.`);
-
-      // 3. Al hacer clic en 'Aceptar', se limpia todo la pantalla (incluyendo el consecutivo que vuelve a '--')
       limpiarFormulario();
-    }, 100);
+      ocultarMensaje("mensaje-venta");
+    }, 4000);
 
   } else {
-    alert(res.datos.mensaje || "Error al guardar la venta");
+    mostrarMensaje("mensaje-venta", res.datos.mensaje || "Error al guardar la venta.", "error");
   }
 }

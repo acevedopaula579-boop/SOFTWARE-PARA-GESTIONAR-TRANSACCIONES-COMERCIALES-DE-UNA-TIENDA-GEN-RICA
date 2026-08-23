@@ -1,7 +1,3 @@
-/* =========================================================
-   ESTILOS EXCLUSIVOS MÓDULO DE REPORTES Y NOTIFICACIONES
-   ========================================================= */
-
 .btn-reporte {
   background: var(--cafe);
   color: #ffffff;
@@ -44,4 +40,8 @@
 .mensaje {
   margin-top: 0;
   margin-bottom: 15px;
+}
+
+.mensaje[hidden] {
+  display: none !important;
 }

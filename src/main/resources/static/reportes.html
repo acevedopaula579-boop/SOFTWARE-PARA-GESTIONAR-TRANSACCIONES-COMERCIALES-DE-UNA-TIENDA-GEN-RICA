@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda SSPV - Gestión de Reportes</title>
+    <!-- Base del proyecto + Estilos avanzados del Sprint 4 -->
+    <link rel="stylesheet" href="css/gestion.css">
+    <link rel="stylesheet" href="css/modulos.css">
+</head>
+<body>
+    <header>
+        <div class="marca">TIENDA SSPV</div>
+        <h1>Gestión de Reportes</h1>
+        <nav class="nav-menu">
+            <a href="usuarios.html">Usuarios</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="proveedores.html">Proveedores</a>
+            <a href="productos.html">Productos</a>
+            <a href="ventas.html">Ventas</a>
+            <a href="reportes.html" class="activo">Reportes</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Opciones de Reporte</h2>
+            <div class="botones">
+                <button type="button" class="btn-reporte" onclick="cargarReporteClientes()">Listado de Clientes</button>
+                <button type="button" class="btn-reporte" onclick="cargarReporteVentas()">Ventas por Cliente</button>
+            </div>
+        </div>
+
+        <div class="card" id="seccion-reporte" hidden>
+            <div class="tabla-header">
+                <h2 id="titulo-reporte">Resultado del Reporte</h2>
+            </div>
+            <table>
+                <thead id="cabecera-tabla"></thead>
+                <tbody id="cuerpo-tabla-reporte"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/reportes.js"></script>
+</body>
+</html>

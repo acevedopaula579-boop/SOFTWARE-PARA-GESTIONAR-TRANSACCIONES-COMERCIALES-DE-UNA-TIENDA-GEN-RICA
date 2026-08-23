@@ -1,0 +1,37 @@
+/* =========================================================
+   ESTILOS EXCLUSIVOS MÓDULO DE REPORTES
+   ========================================================= */
+
+.btn-reporte {
+  background: var(--cafe);
+  color: #ffffff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-reporte:hover {
+  background: var(--cafe-oscuro);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Clases de alineación y filas para tablas dinámicas */
+.celda-centrada { text-align: center; }
+.celda-derecha { text-align: right; }
+
+.fila-total-general {
+  background: #f0ebe4 !important;
+  font-weight: bold;
+}
+
+.fila-total-general td {
+  border-top: 2px solid var(--cafe-oscuro);
+  color: var(--cafe-oscuro);
+  font-size: 14px;
+}

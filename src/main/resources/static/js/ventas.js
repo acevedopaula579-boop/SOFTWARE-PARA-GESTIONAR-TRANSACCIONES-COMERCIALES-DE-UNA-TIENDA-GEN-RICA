@@ -1,56 +1,92 @@
 const BASE_URL = "http://localhost:8080/api";
 
-// Función centralizada de fetch
+// Función centralizada para peticiones
 async function llamar(url, metodo, cuerpo) {
   const opciones = { method: metodo, headers: { "Content-Type": "application/json" } };
   if (cuerpo) opciones.body = JSON.stringify(cuerpo);
+
   const respuesta = await fetch(url, opciones);
   const datos = await respuesta.json().catch(() => ({}));
+
   return { ok: respuesta.ok, status: respuesta.status, datos };
 }
 
-// Obtener la cédula del vendedor/cajero de forma dinámica desde la sesión
+// Blanquear todos los campos del formulario (incluyendo el consecutivo)
+function limpiarFormulario() {
+  document.getElementById("cedulaCliente").value = "";
+  document.getElementById("nombreCliente").value = "";
+  document.getElementById("codigoVenta").value = "--";
+
+  for (let i = 1; i <= 3; i++) {
+    if (document.getElementById(`codigoProducto${i}`)) document.getElementById(`codigoProducto${i}`).value = "";
+    if (document.getElementById(`nombreProducto${i}`)) document.getElementById(`nombreProducto${i}`).value = "";
+    if (document.getElementById(`cantidadProducto${i}`)) document.getElementById(`cantidadProducto${i}`).value = "0";
+    if (document.getElementById(`precioProducto${i}`)) document.getElementById(`precioProducto${i}`).value = "";
+    if (document.getElementById(`subtotalProducto${i}`)) document.getElementById(`subtotalProducto${i}`).value = "";
+  }
+
+  document.getElementById("totalVenta").value = "$ 0";
+  document.getElementById("totalIva").value = "$ 0";
+  document.getElementById("totalConIva").value = "$ 0";
+}
+
+// Obtener la cédula del usuario en sesión
 function obtenerCedulaUsuario() {
   const usuarioSesion = JSON.parse(sessionStorage.getItem("usuario") || localStorage.getItem("usuario") || "{}");
   return usuarioSesion.cedula || usuarioSesion.cedulaUsuario || 123456;
 }
 
-// 1. Buscar Cliente
+// 1. Buscar Cliente por Cédula
 async function buscarCliente() {
   const cedula = document.getElementById("cedulaCliente").value;
   if (!cedula) return alert("Ingrese la cédula del cliente");
 
-  const { ok, datos } = await llamar(`${BASE_URL}/clientes/${cedula}`, "GET");
-  const cliente = datos.datos || datos;
+  let res = await llamar(`${BASE_URL}/clientes/${cedula}`, "GET");
 
-  if (ok && cliente) {
-    document.getElementById("nombreCliente").value = cliente.nombreCliente || cliente.nombreCompleto || cliente.nombre_completo || "";
+  if (res.status === 404) {
+    res = await llamar(`http://localhost:8080/clientes/${cedula}`, "GET");
+  }
+
+  const cliente = res.datos.datos || res.datos;
+  const nombre = cliente.nombreCliente || cliente.nombreCompleto || cliente.nombre_completo || cliente.nombre;
+
+  if (res.ok && nombre) {
+    document.getElementById("nombreCliente").value = nombre;
   } else {
-    alert(datos.mensaje || "Cliente no encontrado");
+    alert(res.datos.mensaje || "Cliente no encontrado");
     document.getElementById("nombreCliente").value = "";
   }
 }
 
-// 2. Buscar Producto
+// 2. Buscar Producto por Código
 async function buscarProducto(num) {
-  const codigo = document.getElementById(`codigoProducto${num}`).value;
+  const inputCodigo = document.getElementById(`codigoProducto${num}`);
+  const codigo = inputCodigo.value;
   if (!codigo) return alert("Ingrese el código del producto");
 
-  const { ok, datos } = await llamar(`${BASE_URL}/productos/${codigo}`, "GET");
-  const prod = datos.datos || datos;
+  let res = await llamar(`${BASE_URL}/productos/${codigo}`, "GET");
 
-  if (ok && prod) {
+  if (res.status === 404) {
+    res = await llamar(`http://localhost:8080/productos/${codigo}`, "GET");
+  }
+
+  const prod = res.datos.datos || res.datos;
+
+  if (res.ok && prod && (prod.nombreProducto || prod.nombre_producto)) {
+    const codigoReal = prod.codigoProducto || prod.codigo_producto || codigo;
+    inputCodigo.value = codigoReal;
+
     document.getElementById(`nombreProducto${num}`).value = prod.nombreProducto || prod.nombre_producto || "";
     document.getElementById(`precioProducto${num}`).value = prod.precioVenta || prod.precio_venta || 0;
     document.getElementById(`ivaProducto${num}`).value = prod.ivaCompra || prod.ivacompra || 19;
     calcularFila(num);
   } else {
-    alert(datos.mensaje || "Producto no encontrado");
+    alert(res.datos.mensaje || "Producto no encontrado");
     limpiarFila(num);
   }
 }
 
-// 3. Cálculos
+// 3. Cálculos de Totales
 function calcularFila(num) {
   const cantidad = parseFloat(document.getElementById(`cantidadProducto${num}`).value) || 0;
   const precio = parseFloat(document.getElementById(`precioProducto${num}`).value) || 0;
@@ -110,9 +146,9 @@ async function confirmarVenta() {
       detalles.push({
         codigoProducto: parseInt(codigo),
         cantidadProducto: cantidad,
-        valorVenta: subtotal,
+        valorVenta: precio,
         valorIva: valorIva,
-        valorTotal: subtotal + valorIva
+        valorTotal: subtotal
       });
     }
   }
@@ -127,25 +163,33 @@ async function confirmarVenta() {
     valorVenta: valorVenta,
     ivaVenta: totalIva,
     totalVenta: valorVenta + totalIva,
-    detalleVenta: detalles
+    detalles: detalles
   };
 
-  // 1. Primer intento a la URL estándar
   let res = await llamar(`${BASE_URL}/ventas`, "POST", ventaPayload);
 
-  // 2. Si da 404, intenta sin la ruta /api
   if (res.status === 404) {
     res = await llamar("http://localhost:8080/ventas", "POST", ventaPayload);
   }
 
-  // 3. Si sigue dando 404, intenta en /ventas/guardar
   if (res.status === 404) {
     res = await llamar(`${BASE_URL}/ventas/guardar`, "POST", ventaPayload);
   }
 
   if (res.ok) {
-    alert(res.datos.mensaje || "Venta registrada con éxito");
-    window.location.reload();
+    const consecutivoGuardado = res.datos.codigoVenta || res.datos.codigo_venta || (res.datos.datos ? res.datos.datos.codigoVenta : res.datos);
+
+    // 1. Mostrar de inmediato el consecutivo en la pantalla
+    document.getElementById("codigoVenta").value = consecutivoGuardado;
+
+    // 2. Dar tiempo al navegador para pintar el número en pantalla antes de lanzar el alert
+    setTimeout(() => {
+      alert(`Venta #${consecutivoGuardado} registrada exitosamente.`);
+
+      // 3. Al hacer clic en 'Aceptar', se limpia todo la pantalla (incluyendo el consecutivo que vuelve a '--')
+      limpiarFormulario();
+    }, 100);
+
   } else {
     alert(res.datos.mensaje || "Error al guardar la venta");
   }

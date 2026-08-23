@@ -9,7 +9,53 @@ async function llamar(url, metodo = "GET", cuerpo = null) {
   return { ok: respuesta.ok, status: respuesta.status, datos };
 }
 
-// 1. Cargar Reporte: Listado de Clientes
+// 1. Cargar Reporte: Listado de Usuarios (con contraseña enmascarada)
+async function cargarReporteUsuarios() {
+  const seccion = document.getElementById("seccion-reporte");
+  const titulo = document.getElementById("titulo-reporte");
+  const cabecera = document.getElementById("cabecera-tabla");
+  const cuerpo = document.getElementById("cuerpo-tabla-reporte");
+
+  titulo.innerText = "Listado de Usuarios";
+  cabecera.innerHTML = `
+    <tr>
+      <th>Cédula</th>
+      <th>Nombre Completo</th>
+      <th>Correo Electrónico</th>
+      <th>Usuario</th>
+      <th>Contraseña</th>
+    </tr>
+  `;
+  cuerpo.innerHTML = `<tr><td colspan="5" style="text-align:center;">Cargando usuarios...</td></tr>`;
+  seccion.hidden = false;
+
+  let res = await llamar(`${BASE_URL}/usuarios`);
+  if (res.status === 404) res = await llamar(`${BASE_URL}/usuarios/listar`);
+
+  const lista = Array.isArray(res.datos) ? res.datos : (res.datos.datos || res.datos.contenido || []);
+
+  if (!res.ok || lista.length === 0) {
+    cuerpo.innerHTML = `<tr><td colspan="5" style="text-align:center;">No se encontraron usuarios registrados.</td></tr>`;
+    return;
+  }
+
+  cuerpo.innerHTML = lista.map(u => {
+    const passReal = String(u.password || u.passwordUsuario || u.clave || u.contrasena || u.password_usuario || '');
+    const passEnPuntos = passReal ? '•'.repeat(passReal.length) : '••••••••';
+
+    return `
+      <tr>
+        <td>${u.cedula || u.cedulaUsuario || u.cedula_usuario || ''}</td>
+        <td>${u.nombre_completo || u.nombreUsuario || u.nombreCompleto || u.nombre || ''}</td>
+        <td>${u.correo_electronico || u.correoElectronico || u.email || ''}</td>
+        <td>${u.usuario || u.login || ''}</td>
+        <td style="font-weight: bold; letter-spacing: 2px;">${passEnPuntos}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+// 2. Cargar Reporte: Listado de Clientes
 async function cargarReporteClientes() {
   const seccion = document.getElementById("seccion-reporte");
   const titulo = document.getElementById("titulo-reporte");
@@ -50,7 +96,7 @@ async function cargarReporteClientes() {
   `).join("");
 }
 
-// 2. Cargar Reporte: Ventas por Cliente
+// 3. Cargar Reporte: Ventas por Cliente
 async function cargarReporteVentas() {
   const seccion = document.getElementById("seccion-reporte");
   const titulo = document.getElementById("titulo-reporte");
@@ -68,7 +114,6 @@ async function cargarReporteVentas() {
   cuerpo.innerHTML = `<tr><td colspan="3" style="text-align:center;">Calculando ventas...</td></tr>`;
   seccion.hidden = false;
 
-  // 1. Obtener Clientes
   let resClientes = await llamar(`${BASE_URL}/clientes`);
   if (resClientes.status === 404) resClientes = await llamar(`${BASE_URL}/clientes/listar`);
   
@@ -76,12 +121,11 @@ async function cargarReporteVentas() {
     ? resClientes.datos 
     : (resClientes.datos.datos || resClientes.datos.contenido || []);
 
-  if (clientes.length === 0) {
-    cuerpo.innerHTML = `<tr><td colspan="3" style="text-align:center;">No existen clientes registrados.</td></tr>`;
+  if (!resClientes.ok || clientes.length === 0) {
+    cuerpo.innerHTML = `<tr><td colspan="3" style="text-align:center;">No existen clientes registrados para calcular ventas.</td></tr>`;
     return;
   }
 
-  // 2. Consultar las ventas individuales de cada cliente usando /api/ventas/cliente/{cedula}
   let acumuladoGeneral = 0;
   let filasHTML = "";
 
@@ -93,11 +137,9 @@ async function cargarReporteVentas() {
     let totalCliente = 0;
 
     if (cedulaStr) {
-      // Petición al endpoint existente en tu VentaControlador.java
       const resVentasCliente = await llamar(`${BASE_URL}/ventas/cliente/${cedulaStr}`);
       const ventasCliente = Array.isArray(resVentasCliente.datos) ? resVentasCliente.datos : [];
 
-      // Sumar todas las ventas de este cliente específico
       totalCliente = ventasCliente.reduce((sum, v) => {
         const monto = v.valorVenta ?? v.valor_venta ?? v.totalVenta ?? v.total_venta ?? v.valorTotal ?? 0;
         return sum + (parseFloat(monto) || 0);

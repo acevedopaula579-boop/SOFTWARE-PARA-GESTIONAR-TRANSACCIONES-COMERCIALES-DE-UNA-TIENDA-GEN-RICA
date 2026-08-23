@@ -1,9 +1,5 @@
 const BASE_URL = "http://localhost:8080/api";
-
-// ==========================================
-// FUNCIONES DE CONTROL DE ALERTAS
-// ==========================================
-
+// Funciones de Alertas
 function mostrarMensaje(idContenedor, texto, tipo = "error") {
   const elem = document.getElementById(idContenedor);
   if (!elem) return;
@@ -26,9 +22,7 @@ function limpiarTodasLasAlertas() {
   ocultarMensaje("mensaje-venta");
 }
 
-// ==========================================
-// CONSULTAS API Y CÁLCULOS
-// ==========================================
+// Consultas y cálculos API
 
 async function llamar(url, metodo, cuerpo) {
   const opciones = { method: metodo, headers: { "Content-Type": "application/json" } };
